@@ -1,8 +1,9 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+"""Телеграм-бот підтримки для прифронтових територій"""# <- перше виправлення
 
 import os
 from dotenv import load_dotenv
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes# <- друге виправлення
 
 load_dotenv()  # завантажує змінні з .env файлу
 
@@ -14,6 +15,7 @@ users = {}
 
 # Команда /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Обробляє команду /start"""  # <- третє виправлення
     user = update.message.from_user
     users[user.id] = user.username  # Зберігаємо користувача в списку
     await update.message.reply_text(
@@ -46,16 +48,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await query.answer()  # Підтверджуємо запит
 
     if query.data == 'show_users':
-        # Створюємо список інлайн-кнопок з доступними користувачами
         if users:
-            keyboard = [[InlineKeyboardButton(username, callback_data=f'chat_{user_id}')] for user_id, username in
-                        users.items()]
+            keyboard = [[InlineKeyboardButton(username, callback_data=f'chat_{user_id}')] for user_id, username in users.items()]
             reply_markup = InlineKeyboardMarkup(keyboard)
             await query.edit_message_text("Оберіть користувача для спілкування:", reply_markup=reply_markup)
         else:
             await query.edit_message_text("Наразі немає доступних користувачів для спілкування.")
-
-
     elif query.data == 'support':
         await query.edit_message_text("Зараз ви не можете спілкуватися з підтримкою. Зв'яжіться пізніше.")
 
@@ -64,10 +62,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def chat_with_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-
-    # Витягуємо ID вибраного користувача з callback_data
     user_id = int(query.data.split('_')[1])
-
     if user_id in users:
         await query.edit_message_text(
             f'Ви обрали {users[user_id]} для спілкування. Напишіть /send {user_id} <повідомлення>, щоб надіслати повідомлення.')
@@ -78,10 +73,8 @@ async def chat_with_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 # Команда для відправки повідомлення іншому користувачу
 async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
-        user_id = int(context.args[0])  # Отримуємо ID отримувача
-        message_text = ' '.join(context.args[1:])  # Отримуємо повідомлення
-
-        # Перевіряємо, чи зареєстрований отримувач
+        user_id = int(context.args[0])
+        message_text = ' '.join(context.args[1:])
         if user_id in users:
             await context.bot.send_message(chat_id=user_id,
                                            text=f"Повідомлення від {update.message.from_user.username}: {message_text}")
@@ -130,25 +123,16 @@ async def other(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def main() -> None:
-    # Створюємо екземпляр Application
     application = Application.builder().token(TOKEN).build()
-
-    # Додаємо обробники команд
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("situation", situation))
     application.add_handler(CommandHandler("resources", resources))
     application.add_handler(CommandHandler("communicate", communicate))
     application.add_handler(CommandHandler("safety", safety))
     application.add_handler(CommandHandler("other", other))
-
-    # Додаємо обробник натискань на кнопки
     application.add_handler(CallbackQueryHandler(button_handler, pattern='^show_users$'))
     application.add_handler(CallbackQueryHandler(chat_with_user, pattern='^chat_'))
-
-    # Додаємо обробник для надсилання повідомлень
     application.add_handler(CommandHandler("send", send_message))
-
-    # Запускаємо бота в режимі опитування
     application.run_polling()
 
 
