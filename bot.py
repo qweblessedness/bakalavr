@@ -16,7 +16,13 @@ users = {}
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Обробка команди /start — вітання та інструкція."""
+    """
+    Виводить привітальне повідомлення та перелік доступних команд.
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення, який надходить від Telegram API.
+        context (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст виконання команди.
+    """
     user = update.message.from_user
     users[user.id] = user.username
     await update.message.reply_text(
@@ -30,7 +36,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def communicate(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Обробка команди /communicate — кнопки для вибору типу спілкування."""
+    """
+    Відправляє користувачу інлайн-кнопки для вибору типу спілкування.
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення від Telegram.
+        context (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст виконання команди.
+    """
     keyboard = [
         [InlineKeyboardButton("Спілкуйтеся з іншими людьми в прифронтовій зоні", callback_data="show_users")],
         [InlineKeyboardButton("Спілкуйтеся з тими, хто підтримує", callback_data="support")],
@@ -40,7 +52,13 @@ async def communicate(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Обробка натискань на інлайн-кнопки."""
+    """
+    Обробляє натискання на інлайн-кнопки та виконує відповідні дії.
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення з callback.
+        context (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст виконання.
+    """
     query = update.callback_query
     await query.answer()
 
@@ -59,7 +77,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 async def chat_with_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Вибір користувача для спілкування."""
+    """
+    Обробляє вибір користувача для спілкування.
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення з callback.
+        context (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст виконання.
+    """
     query = update.callback_query
     await query.answer()
 
@@ -73,7 +97,19 @@ async def chat_with_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Надсилання повідомлення обраному користувачу."""
+    """
+    Надсилає повідомлення іншому користувачу через Telegram ID.
+
+    Команда: /send <user_id> <повідомлення>
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення від Telegram.
+        context (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст виконання, включає аргументи команди.
+
+    Raises:
+        IndexError: Якщо не передано аргументи.
+        ValueError: Якщо user_id не є числом.
+    """
     try:
         user_id = int(context.args[0])
         message_text = " ".join(context.args[1:])
@@ -90,7 +126,13 @@ async def send_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 async def situation(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    """Інформація про поточну ситуацію."""
+    """
+    Надсилає інформацію про поточну ситуацію в прифронтовій зоні.
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення.
+        _ (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст не використовується.
+    """
     await update.message.reply_text(
         "Поточна ситуація в прифронтовій зоні:\n"
         "1. Розташування бомбосховищ: ...\n"
@@ -100,7 +142,13 @@ async def situation(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def resources(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    """Інформація про доступні ресурси."""
+    """
+    Надсилає перелік доступних ресурсів для мешканців прифронтових територій.
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення.
+        _ (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст не використовується.
+    """
     await update.message.reply_text(
         "Доступні ресурси:\n"
         "1. Медична допомога: ...\n"
@@ -110,7 +158,13 @@ async def resources(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def safety(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    """Поради з безпеки."""
+    """
+    Надсилає поради з безпеки.
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення.
+        _ (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст не використовується.
+    """
     await update.message.reply_text(
         "Інформація про безпеку:\n"
         "1. Як залишатися в безпеці: ...\n"
@@ -120,7 +174,13 @@ async def safety(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def other(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    """Інші корисні ресурси."""
+    """
+    Надсилає інші корисні ресурси.
+
+    Args:
+        update (telegram.Update): Об'єкт оновлення.
+        _ (telegram.ext.ContextTypes.DEFAULT_TYPE): Контекст не використовується.
+    """
     await update.message.reply_text(
         "Інші ресурси:\n"
         "1. Карти: ...\n"
@@ -130,7 +190,12 @@ async def other(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def main() -> None:
-    """Запуск бота."""
+    """
+    Запускає Telegram-бота та реєструє всі обробники команд.
+
+    Returns:
+        None
+    """
     application = Application.builder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
